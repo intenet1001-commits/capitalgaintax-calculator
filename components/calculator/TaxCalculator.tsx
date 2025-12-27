@@ -94,55 +94,118 @@ export function TaxCalculator() {
         />
       </div>
 
+      {/* 계산 흐름 설명 */}
+      <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg border text-sm space-y-3">
+        <h3 className="font-semibold">📋 양도소득세 계산 흐름</h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 text-xs">
+          <div className="p-2 bg-background rounded border text-center">
+            <div className="text-muted-foreground mb-1">STEP 1</div>
+            <div className="font-medium">매도가액 - 취득가액 - 필요경비</div>
+            <div className="text-primary font-semibold mt-1">→ 양도차익</div>
+          </div>
+          <div className="p-2 bg-blue-50 dark:bg-blue-950/50 rounded border border-blue-200 dark:border-blue-800 text-center">
+            <div className="text-blue-600 dark:text-blue-400 mb-1">STEP 2</div>
+            <div className="font-medium">양도차익 - 비과세(RIA)</div>
+            <div className="text-blue-600 dark:text-blue-400 font-semibold mt-1">→ 과세대상 양도차익</div>
+            <div className="text-muted-foreground text-[10px]">(= 양도소득금액)</div>
+          </div>
+          <div className="p-2 bg-amber-50 dark:bg-amber-950/50 rounded border border-amber-200 dark:border-amber-800 text-center">
+            <div className="text-amber-600 dark:text-amber-400 mb-1">STEP 3</div>
+            <div className="font-medium">양도소득금액 - 기본공제 - 특별공제</div>
+            <div className="text-amber-600 dark:text-amber-400 font-semibold mt-1">→ 과세표준</div>
+            <div className="text-muted-foreground text-[10px]">(환헤지 소득공제 등)</div>
+          </div>
+          <div className="p-2 bg-red-50 dark:bg-red-950/50 rounded border border-red-200 dark:border-red-800 text-center">
+            <div className="text-red-600 dark:text-red-400 mb-1">STEP 4</div>
+            <div className="font-medium">과세표준 × 22%</div>
+            <div className="text-red-600 dark:text-red-400 font-semibold mt-1">→ 납부세액</div>
+            <div className="text-muted-foreground text-[10px]">(국세 20% + 지방세 2%)</div>
+          </div>
+        </div>
+      </div>
+
       {/* 계산 예시 가이드 */}
       <div className="p-4 bg-muted/30 rounded-lg border text-sm space-y-4">
         <div>
           <h3 className="font-semibold mb-2">📊 계산 예시</h3>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-background rounded border text-xs">
-            <span>매입 <strong>1천만원</strong></span>
+            <span>취득가액 <strong>1천만원</strong></span>
             <span className="text-muted-foreground">→</span>
-            <span>매도 <strong>1억원</strong></span>
+            <span>매도가액 <strong>1억원</strong></span>
             <span className="text-muted-foreground">|</span>
             <span>필요경비 <strong>10만원</strong></span>
           </div>
         </div>
 
         <div className="space-y-3">
-          {/* Step 1: 양도차익 */}
-          <div className="p-2 bg-background rounded border">
-            <div className="font-medium text-xs text-muted-foreground mb-1">STEP 1. 양도차익 계산</div>
-            <div className="text-sm">
-              1억원 - 1천만원 - 10만원 = <strong>8,990만원</strong>
+          {/* 현행 제도 */}
+          <div className="p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border space-y-2">
+            <div className="font-semibold text-sm text-gray-700 dark:text-gray-300 pb-2 border-b">🔴 현행 제도</div>
+            <div className="text-sm space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded">STEP 1</span>
+                <span>1억 - 1천만 - 10만 = <strong>양도차익 8,990만원</strong></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded">STEP 2</span>
+                <span className="text-muted-foreground">비과세 없음 → 양도소득금액 = 8,990만원</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded">STEP 3</span>
+                <span>8,990만 - 250만(기본공제) = <strong>과세표준 8,740만원</strong></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-red-200 dark:bg-red-800 px-1.5 py-0.5 rounded">STEP 4</span>
+                <span>8,740만 × 22% = <strong className="text-red-600">납부세액 1,923만원</strong></span>
+              </div>
             </div>
           </div>
 
-          {/* Step 2: 현행 제도 */}
-          <div className="p-2 bg-background rounded border">
-            <div className="font-medium text-xs text-muted-foreground mb-1">STEP 2. 현행 제도</div>
-            <div className="text-sm space-y-0.5">
-              <div>과세표준: 8,990만원 - 250만원(기본공제) = <strong>8,740만원</strong></div>
-              <div>납부세액: 8,740만원 × 22% = <strong className="text-red-600">1,923만원</strong></div>
+          {/* 개정안: RIA만 적용 */}
+          <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800 space-y-2">
+            <div className="font-semibold text-sm text-blue-700 dark:text-blue-300 pb-2 border-b border-blue-200 dark:border-blue-700">🔵 개정안 (RIA 비과세 적용, 1분기 100%)</div>
+            <div className="text-sm space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-blue-200 dark:bg-blue-800 px-1.5 py-0.5 rounded">STEP 1</span>
+                <span>양도차익 = <strong>8,990만원</strong></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-blue-200 dark:bg-blue-800 px-1.5 py-0.5 rounded">STEP 2</span>
+                <span>8,990만 - <span className="text-green-600 font-medium">5천만(비과세)</span> = <strong>과세대상 양도차익 3,990만원</strong></span>
+              </div>
+              <div className="text-xs text-blue-600 dark:text-blue-400 ml-14">└ 비과세 = min(8,990만, 5천만) × 100% = 5천만원</div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-blue-200 dark:bg-blue-800 px-1.5 py-0.5 rounded">STEP 3</span>
+                <span>3,990만 - 250만(기본공제) = <strong>과세표준 3,740만원</strong></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-orange-200 dark:bg-orange-800 px-1.5 py-0.5 rounded">STEP 4</span>
+                <span>3,740만 × 22% = <strong className="text-orange-600">납부세액 823만원</strong></span>
+              </div>
             </div>
           </div>
 
-          {/* Step 3: RIA 적용 */}
-          <div className="p-2 bg-blue-50 dark:bg-blue-950/30 rounded border border-blue-200 dark:border-blue-800">
-            <div className="font-medium text-xs text-blue-700 dark:text-blue-300 mb-1">STEP 3. RIA 비과세 적용 (1분기 100%)</div>
-            <div className="text-sm space-y-0.5">
-              <div>RIA 비과세: min(8,990만원, 5천만원) × 100% = <strong>5천만원</strong></div>
-              <div>과세대상 소득: 8,990만원 - 5천만원 = 3,990만원</div>
-              <div>과세표준: 3,990만원 - 250만원 = <strong>3,740만원</strong></div>
-              <div>납부세액: 3,740만원 × 22% = <strong className="text-orange-600">823만원</strong></div>
-            </div>
-          </div>
-
-          {/* Step 4: 환헷지 추가 */}
-          <div className="p-2 bg-amber-50 dark:bg-amber-950/30 rounded border border-amber-200 dark:border-amber-800">
-            <div className="font-medium text-xs text-amber-700 dark:text-amber-300 mb-1">STEP 4. 환헷지 소득공제 추가 (1억원)</div>
-            <div className="text-sm space-y-0.5">
-              <div>환헷지 공제: 1억원 × 5% = <strong>500만원</strong> (최대한도)</div>
-              <div>과세표준: 3,990만원 - 250만원 - 500만원 = <strong>3,240만원</strong></div>
-              <div>납부세액: 3,240만원 × 22% = <strong className="text-green-600">713만원</strong></div>
+          {/* 개정안: RIA + 환헷지 적용 */}
+          <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800 space-y-2">
+            <div className="font-semibold text-sm text-green-700 dark:text-green-300 pb-2 border-b border-green-200 dark:border-green-700">🟢 개정안 (RIA + 환헷지 소득공제 적용)</div>
+            <div className="text-sm space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-green-200 dark:bg-green-800 px-1.5 py-0.5 rounded">STEP 1</span>
+                <span>양도차익 = <strong>8,990만원</strong></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-green-200 dark:bg-green-800 px-1.5 py-0.5 rounded">STEP 2</span>
+                <span>8,990만 - <span className="text-green-600 font-medium">5천만(비과세)</span> = <strong>양도소득금액 3,990만원</strong></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-green-200 dark:bg-green-800 px-1.5 py-0.5 rounded">STEP 3</span>
+                <span>3,990만 - 250만 - <span className="text-green-600 font-medium">500만(환헷지)</span> = <strong>과세표준 3,240만원</strong></span>
+              </div>
+              <div className="text-xs text-green-600 dark:text-green-400 ml-14">└ 환헷지 소득공제 = 1억 × 5% = 500만원 (최대한도)</div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-green-300 dark:bg-green-700 px-1.5 py-0.5 rounded font-medium">STEP 4</span>
+                <span>3,240만 × 22% = <strong className="text-green-600">납부세액 713만원</strong></span>
+              </div>
             </div>
           </div>
 

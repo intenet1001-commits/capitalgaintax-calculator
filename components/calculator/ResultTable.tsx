@@ -22,102 +22,108 @@ export function ResultTable({ result, type, currentTax }: ResultTableProps) {
     <div className="space-y-3">
       {/* STEP 1: 양도차익 */}
       <div className="flex justify-between text-sm">
-        <span className="text-muted-foreground">양도차익</span>
-        <span>{formatCurrency(result.capitalGain)}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs bg-muted px-1.5 py-0.5 rounded">STEP 1</span>
+          <span className="text-muted-foreground">양도차익</span>
+        </div>
+        <span className="font-medium">{formatCurrency(result.capitalGain)}</span>
       </div>
-
-      {/* STEP 2: 양도소득금액 */}
-      <div className="flex justify-between text-sm">
-        <span className="text-muted-foreground">양도소득금액</span>
-        <span>{formatCurrency(result.totalGains)}</span>
-      </div>
-
-      {/* STEP 3: RIA 비과세 - 양도소득금액에서 직접 차감 */}
-      {isAdditional && result.riaDeduction > 0 && (
-        <>
-          <div className="bg-blue-50 dark:bg-blue-950/50 p-2 rounded border border-blue-200 dark:border-blue-800">
-            <div className="flex justify-between text-sm">
-              <span className="text-blue-700 dark:text-blue-300 font-medium">
-                ⓵ 비과세 (양도소득에서 차감)
-              </span>
-            </div>
-            <div className="flex justify-between text-sm mt-1">
-              <span className="text-muted-foreground ml-4">
-                RIA ({(result.riaDiscountRate * 100).toFixed(0)}% 감면)
-              </span>
-              <span className="text-green-600 font-medium">-{formatCurrency(result.riaDeduction)}</span>
-            </div>
-            <div className="text-xs text-muted-foreground ml-4 mt-1">
-              min(양도차익, 5천만원) × 감면율 = {formatCurrency(result.riaDeduction)}
-            </div>
-          </div>
-          <div className="flex justify-between text-sm font-medium">
-            <span>→ 과세대상 양도소득금액</span>
-            <span>{formatCurrency(result.adjustedTotalGains)}</span>
-          </div>
-        </>
-      )}
 
       <Separator />
 
-      {/* STEP 4: 소득공제 - 과세표준 계산시 차감 */}
-      <div className="space-y-2">
-        {isAdditional && (result.riaDeduction > 0 || result.hedgeDeduction > 0) ? (
-          <div className="bg-amber-50 dark:bg-amber-950/50 p-2 rounded border border-amber-200 dark:border-amber-800">
-            <div className="flex justify-between text-sm">
-              <span className="text-amber-700 dark:text-amber-300 font-medium">
-                ⓶ 소득공제 (과세표준 계산시 차감)
-              </span>
-            </div>
-            <div className="flex justify-between text-sm mt-1">
-              <span className="text-muted-foreground ml-4">기본공제</span>
-              <span className="text-green-600">-{formatCurrency(result.basicDeduction)}</span>
-            </div>
-            {result.hedgeDeduction > 0 && (
-              <>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground ml-4">환헷지 공제</span>
-                  <span className="text-green-600">-{formatCurrency(result.hedgeDeduction)}</span>
-                </div>
-                <div className="text-xs text-muted-foreground ml-4 mt-1">
-                  환헷지 금액 × 5% (최대 500만원)
-                </div>
-              </>
-            )}
-          </div>
+      {/* STEP 2: 비과세 (RIA) - 양도차익 단계에서 비과세 제외 */}
+      <div className="flex justify-between text-sm">
+        <div className="flex items-center gap-2">
+          <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded">STEP 2</span>
+          <span className="text-muted-foreground">비과세 (RIA)</span>
+        </div>
+        {isAdditional && result.riaExemption > 0 ? (
+          <span className="text-green-600 font-medium">-{formatCurrency(result.riaExemption)}</span>
         ) : (
-          <>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">기본공제</span>
-              <span className="text-green-600">-{formatCurrency(result.basicDeduction)}</span>
-            </div>
-          </>
+          <span className="text-muted-foreground">-</span>
         )}
       </div>
 
+      {/* RIA 상세 내역 */}
+      {isAdditional && result.riaExemption > 0 && (
+        <div className="bg-blue-50 dark:bg-blue-950/50 p-2 rounded border border-blue-200 dark:border-blue-800 ml-4 text-xs space-y-1">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">비과세 한도</span>
+            <span>min(양도차익, 5천만원) = {formatCurrency(result.riaEligibleGain)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">감면율</span>
+            <span>{(result.riaDiscountRate * 100).toFixed(0)}%</span>
+          </div>
+        </div>
+      )}
+
+      {/* 과세대상 양도차익 (= 양도소득금액) */}
+      <div className="flex justify-between text-sm font-medium bg-muted/50 p-2 rounded">
+        <span>→ 과세대상 양도차익 (양도소득금액)</span>
+        <span>{formatCurrency(result.taxableCapitalGain)}</span>
+      </div>
+
       <Separator />
 
-      {/* STEP 5: 과세표준 */}
-      <div className="flex justify-between text-sm font-medium">
-        <span>과세표준</span>
+      {/* STEP 3: 소득공제 - 과세표준 계산시 차감 */}
+      <div className="space-y-2">
+        <div className="flex justify-between text-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-xs bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 px-1.5 py-0.5 rounded">STEP 3</span>
+            <span className="text-muted-foreground">소득공제</span>
+          </div>
+        </div>
+
+        <div className="ml-4 space-y-1">
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">기본공제</span>
+            <span className="text-green-600">-{formatCurrency(result.basicDeduction)}</span>
+          </div>
+          {isAdditional && result.hedgeDeduction > 0 && (
+            <>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">환헷지 소득공제</span>
+                <span className="text-green-600">-{formatCurrency(result.hedgeDeduction)}</span>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                └ 환헷지 금액 × 5% (최대 500만원)
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* 과세표준 */}
+      <div className="flex justify-between text-sm font-medium bg-muted/50 p-2 rounded">
+        <span>→ 과세표준</span>
         <span>{formatCurrency(result.taxBase)}</span>
       </div>
 
       <Separator />
 
-      {/* STEP 6: 세금 계산 */}
+      {/* STEP 4: 세금 계산 */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">국세 (20%)</span>
-          <span>{formatCurrency(result.nationalTax)}</span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">지방소득세 (2%)</span>
-          <span>{formatCurrency(result.localTax)}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-1.5 py-0.5 rounded">STEP 4</span>
+            <span className="text-muted-foreground">세금 (22%)</span>
+          </div>
         </div>
 
-        <div className="flex justify-between font-medium pt-1">
-          <span>납부세액 합계</span>
+        <div className="ml-4 space-y-1">
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">국세 (20%)</span>
+            <span>{formatCurrency(result.nationalTax)}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">지방소득세 (2%)</span>
+            <span>{formatCurrency(result.localTax)}</span>
+          </div>
+        </div>
+
+        <div className="flex justify-between font-semibold pt-1 bg-red-50 dark:bg-red-950/50 p-2 rounded">
+          <span>→ 납부세액</span>
           <span className="text-red-600">{formatCurrency(result.totalTax)}</span>
         </div>
       </div>
@@ -155,7 +161,7 @@ export function ResultTable({ result, type, currentTax }: ResultTableProps) {
                   <span className="font-medium">{formatCurrency(result.riaTaxSaving)}</span>
                 </div>
                 <div className="text-green-600/70 dark:text-green-400/70 ml-3">
-                  양도소득 {formatCurrency(result.riaDeduction)} 비과세 → 양도소득 감소 → 세금 {formatCurrency(result.riaTaxSaving)} 절감
+                  양도차익 {formatCurrency(result.riaExemption)} 비과세 → 과세대상 양도차익 감소 → 세금 {formatCurrency(result.riaTaxSaving)} 절감
                 </div>
               </div>
             )}
