@@ -31,7 +31,8 @@ export interface AdditionalDeductionInput {
 
 // 추가공제 결과 타입
 export interface AdditionalTaxResult extends TaxResult {
-  riaEligibleGain: number;        // RIA 대상 양도차익 (양도차익과 5천만원 중 작은 값)
+  riaExemptionRatio: number;      // RIA 비과세 비율 (매도금액 기준)
+  riaEligibleGain: number;        // RIA 대상 양도차익 (양도차익 × 비과세 비율)
   riaExemption: number;           // RIA 비과세액 (대상 양도차익 × 감면율)
   riaDiscountRate: number;        // RIA 감면율
   hedgeDeduction: number;         // 환헷지 공제액 (소득공제)
@@ -115,7 +116,7 @@ function calculateHedgeDeduction(hedgeAmount: number): number {
  *
  * 계산 흐름:
  * 1. 양도차익 계산
- * 2. RIA 비과세 적용 → 과세대상 양도차익 (양도차익 단계에서 비과세 제외)
+ * 2. RIA 비과세 적용 → 과세대상 양도차익 (매도금액 기준 비례 배분)
  * 3. 양도소득금액 = 과세대상 양도차익
  * 4. 소득공제 (기본공제 + 환헷지 공제)
  * 5. 과세표준
@@ -127,6 +128,7 @@ export function calculateAdditionalTax(
   currentResult: TaxResult
 ): AdditionalTaxResult {
   const { applyRIA, returnQuarter, applyHedge, hedgeAmount } = additionalInput;
+  const { saleCost } = currentInput;
 
   // RIA 감면율
   const riaDiscountRate = applyRIA ? getRIADiscountRate(returnQuarter) : 0;
@@ -134,8 +136,13 @@ export function calculateAdditionalTax(
   // 환헷지 공제액 (소득공제)
   const hedgeDeduction = applyHedge ? calculateHedgeDeduction(hedgeAmount) : 0;
 
-  // RIA 대상 양도차익 (양도차익과 5천만원 중 작은 값)
-  const riaEligibleGain = applyRIA ? Math.min(currentResult.capitalGain, TAX_CONSTANTS.RIA_LIMIT) : 0;
+  // RIA 비과세 비율 = min(5천만원, 매도금액) / 매도금액 (매도금액 기준 비례 배분)
+  const riaExemptionRatio = applyRIA && saleCost > 0
+    ? Math.min(TAX_CONSTANTS.RIA_LIMIT, saleCost) / saleCost
+    : 0;
+
+  // RIA 대상 양도차익 = 양도차익 × 비과세 비율
+  const riaEligibleGain = Math.floor(currentResult.capitalGain * riaExemptionRatio);
 
   // RIA 비과세액 = 대상 양도차익 × 감면율
   const riaExemption = Math.floor(riaEligibleGain * riaDiscountRate);
@@ -175,6 +182,7 @@ export function calculateAdditionalTax(
     totalGains,
     basicDeduction: TAX_CONSTANTS.BASIC_DEDUCTION,
     hedgeDeduction,
+    riaExemptionRatio,
     riaEligibleGain,
     riaExemption,
     riaDiscountRate,

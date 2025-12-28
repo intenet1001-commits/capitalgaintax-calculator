@@ -68,11 +68,21 @@ export function NewTaxSection({
             {input.applyRIA && (
               <div className="ml-6 space-y-4 p-4 bg-muted/50 rounded-lg border">
                 <div className="space-y-2">
+                  <Label className="text-sm font-medium">비과세 비율 (매도금액 기준)</Label>
+                  <div className="p-3 bg-background rounded border text-sm">
+                    <span className="font-semibold">{(result.riaExemptionRatio * 100).toFixed(1)}%</span>
+                    <span className="text-muted-foreground ml-2">
+                      = min({formatCurrency(TAX_CONSTANTS.RIA_LIMIT)}, 매도금액) / 매도금액
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
                   <Label className="text-sm font-medium">RIA 대상 양도차익 (자동계산)</Label>
                   <div className="p-3 bg-background rounded border text-sm">
                     <span className="font-semibold">{formatCurrency(result.riaEligibleGain)}</span>
                     <span className="text-muted-foreground ml-2">
-                      = min(양도차익, {formatCurrency(TAX_CONSTANTS.RIA_LIMIT)})
+                      = 양도차익 × {(result.riaExemptionRatio * 100).toFixed(1)}%
                     </span>
                   </div>
                 </div>
@@ -101,7 +111,7 @@ export function NewTaxSection({
                 <div className="text-xs text-muted-foreground space-y-1">
                   <p>• 2025.12.23.까지 보유한 해외주식 매각 후</p>
                   <p>• 원화 환전 → 국내 주식 1년 장기투자 조건</p>
-                  <p>• 양도차익 최대 {formatCurrency(TAX_CONSTANTS.RIA_LIMIT)}까지 비과세</p>
+                  <p>• <strong>매도금액 {formatCurrency(TAX_CONSTANTS.RIA_LIMIT)} 한도</strong>로 비례 비과세</p>
                 </div>
               </div>
             )}

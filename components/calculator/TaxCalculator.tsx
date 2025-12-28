@@ -105,9 +105,9 @@ export function TaxCalculator() {
           </div>
           <div className="p-2 bg-blue-50 dark:bg-blue-950/50 rounded border border-blue-200 dark:border-blue-800 text-center">
             <div className="text-blue-600 dark:text-blue-400 mb-1">STEP 2</div>
-            <div className="font-medium">양도차익 - 비과세(RIA)</div>
+            <div className="font-medium">양도차익 × (1 - 비과세비율)</div>
             <div className="text-blue-600 dark:text-blue-400 font-semibold mt-1">→ 과세대상 양도차익</div>
-            <div className="text-muted-foreground text-[10px]">(= 양도소득금액)</div>
+            <div className="text-muted-foreground text-[10px]">(비과세비율 = 5천만/매도금액)</div>
           </div>
           <div className="p-2 bg-amber-50 dark:bg-amber-950/50 rounded border border-amber-200 dark:border-amber-800 text-center">
             <div className="text-amber-600 dark:text-amber-400 mb-1">STEP 3</div>
@@ -171,16 +171,16 @@ export function TaxCalculator() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs bg-blue-200 dark:bg-blue-800 px-1.5 py-0.5 rounded">STEP 2</span>
-                <span>8,990만 - <span className="text-green-600 font-medium">5천만(비과세)</span> = <strong>과세대상 양도차익 3,990만원</strong></span>
+                <span>8,990만 - <span className="text-green-600 font-medium">4,495만(비과세)</span> = <strong>과세대상 양도차익 4,495만원</strong></span>
               </div>
-              <div className="text-xs text-blue-600 dark:text-blue-400 ml-14">└ 비과세 = min(8,990만, 5천만) × 100% = 5천만원</div>
+              <div className="text-xs text-blue-600 dark:text-blue-400 ml-14">└ 비과세 = 8,990만 × (5천만/1억) × 100% = 4,495만원</div>
               <div className="flex items-center gap-2">
                 <span className="text-xs bg-blue-200 dark:bg-blue-800 px-1.5 py-0.5 rounded">STEP 3</span>
-                <span>3,990만 - 250만(기본공제) = <strong>과세표준 3,740만원</strong></span>
+                <span>4,495만 - 250만(기본공제) = <strong>과세표준 4,245만원</strong></span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs bg-orange-200 dark:bg-orange-800 px-1.5 py-0.5 rounded">STEP 4</span>
-                <span>3,740만 × 22% = <strong className="text-orange-600">납부세액 823만원</strong></span>
+                <span>4,245만 × 22% = <strong className="text-orange-600">납부세액 934만원</strong></span>
               </div>
             </div>
           </div>
@@ -195,16 +195,17 @@ export function TaxCalculator() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs bg-green-200 dark:bg-green-800 px-1.5 py-0.5 rounded">STEP 2</span>
-                <span>8,990만 - <span className="text-green-600 font-medium">5천만(비과세)</span> = <strong>양도소득금액 3,990만원</strong></span>
+                <span>8,990만 - <span className="text-green-600 font-medium">4,495만(비과세)</span> = <strong>양도소득금액 4,495만원</strong></span>
               </div>
+              <div className="text-xs text-green-600 dark:text-green-400 ml-14">└ 비과세 = 8,990만 × (5천만/1억) = 4,495만원</div>
               <div className="flex items-center gap-2">
                 <span className="text-xs bg-green-200 dark:bg-green-800 px-1.5 py-0.5 rounded">STEP 3</span>
-                <span>3,990만 - 250만 - <span className="text-green-600 font-medium">500만(환헷지)</span> = <strong>과세표준 3,240만원</strong></span>
+                <span>4,495만 - 250만 - <span className="text-green-600 font-medium">500만(환헷지)</span> = <strong>과세표준 3,745만원</strong></span>
               </div>
               <div className="text-xs text-green-600 dark:text-green-400 ml-14">└ 환헷지 소득공제 = 1억 × 5% = 500만원 (최대한도)</div>
               <div className="flex items-center gap-2">
                 <span className="text-xs bg-green-300 dark:bg-green-700 px-1.5 py-0.5 rounded font-medium">STEP 4</span>
-                <span>3,240만 × 22% = <strong className="text-green-600">납부세액 713만원</strong></span>
+                <span>3,745만 × 22% = <strong className="text-green-600">납부세액 824만원</strong></span>
               </div>
             </div>
           </div>
@@ -221,11 +222,11 @@ export function TaxCalculator() {
               </div>
               <div className="flex flex-col items-center">
                 <span className="text-2xl">→</span>
-                <span className="text-xs font-bold text-green-600 bg-green-100 dark:bg-green-900 px-2 py-0.5 rounded-full">-63%</span>
+                <span className="text-xs font-bold text-green-600 bg-green-100 dark:bg-green-900 px-2 py-0.5 rounded-full">-57%</span>
               </div>
               <div className="text-center">
                 <div className="text-xs text-muted-foreground mb-1">개정안</div>
-                <div className="text-2xl font-bold text-green-600">713만원</div>
+                <div className="text-2xl font-bold text-green-600">824만원</div>
               </div>
             </div>
 
@@ -233,7 +234,7 @@ export function TaxCalculator() {
             <div className="bg-green-100 dark:bg-green-900/50 rounded-lg p-3 text-center">
               <div className="text-xs text-green-700 dark:text-green-300 mb-1">절세 금액</div>
               <div className="text-3xl font-black text-green-600 dark:text-green-400">
-                1,210만원
+                1,099만원
                 <span className="text-lg ml-1">절감!</span>
               </div>
             </div>
@@ -249,7 +250,7 @@ export function TaxCalculator() {
               <div className="flex items-center gap-2 text-xs">
                 <span className="w-12 text-right text-muted-foreground">개정안</span>
                 <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
-                  <div className="bg-green-500 h-full rounded-full" style={{ width: '37%' }}></div>
+                  <div className="bg-green-500 h-full rounded-full" style={{ width: '43%' }}></div>
                 </div>
               </div>
             </div>
